@@ -21,5 +21,13 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Seed data untuk sistem pakar diabetes
+        $this->call([
+            AdminUserSeeder::class,
+            GejalaSeeder::class,
+            PenyakitSeeder::class,
+            AturanSeeder::class,
+        ]);
     }
 }
