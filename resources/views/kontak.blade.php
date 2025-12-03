@@ -75,7 +75,7 @@
                                 <i class="fas fa-map-marker-alt text-blue-600 text-xl mr-4 mt-1"></i>
                                 <div>
                                     <h4 class="font-bold text-gray-900">Alamat</h4>
-                                    <p class="text-gray-600">Universitas Negeri, Jl. Pendidikan No. 1, Kota, Indonesia</p>
+                                    <p class="text-gray-600">Universitas Muhammadiyah</p>
                                 </div>
                             </div>
                         </div>

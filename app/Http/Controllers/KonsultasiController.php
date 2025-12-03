@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aturan;
 use App\Models\Gejala;
+use App\Models\Activity;
 use Illuminate\Http\Request;
 
 class KonsultasiController extends Controller
@@ -24,14 +25,80 @@ class KonsultasiController extends Controller
     public function diagnose(Request $request)
     {
         $validated = $request->validate([
+            'user_name' => 'required|string|max:191',
+            'user_age' => 'required|integer|min:0|max:120',
             'gejala_ids' => 'required|array',
             'gejala_ids.*' => 'integer|exists:gejalas,id'
         ]);
 
         $selectedGejalaIds = $validated['gejala_ids'];
+        $userName = $validated['user_name'];
+        $userAge = $validated['user_age'];
 
         // Forward Chaining Logic
         $diagnosis = $this->forwardChaining($selectedGejalaIds);
+
+        // Save activity log for admin review
+        try {
+            $user = auth()->user();
+            $topSummary = null;
+            if (is_array($diagnosis) && !empty($diagnosis)) {
+                $first = reset($diagnosis);
+                if (is_array($first) && isset($first['penyakit'])) {
+                    $penyakitName = is_object($first['penyakit']) ? ($first['penyakit']->nama_penyakit ?? null) : ($first['penyakit']['nama_penyakit'] ?? null);
+                    $confidence = $first['confidence'] ?? null;
+                    $topSummary = trim(($penyakitName ?? '-') . ' (' . ($confidence !== null ? number_format($confidence, 2) : '-') . ')');
+                }
+            }
+
+            // Normalize diagnosis data to arrays so JSON cast works reliably
+            $normalizedDiagnosis = null;
+            try {
+                if (is_array($diagnosis)) {
+                    $normalizedDiagnosis = array_map(function ($item) {
+                        // If penyakit is Eloquent model, convert to simple array
+                        if (isset($item['penyakit'])) {
+                            if (is_object($item['penyakit'])) {
+                                $item['penyakit'] = [
+                                    'id' => $item['penyakit']->id ?? null,
+                                    'nama_penyakit' => $item['penyakit']->nama_penyakit ?? null,
+                                ];
+                            }
+                        }
+
+                        // Ensure 'aturans' is array of strings
+                        if (isset($item['aturans']) && is_array($item['aturans'])) {
+                            $item['aturans'] = array_map('strval', $item['aturans']);
+                        }
+
+                        return $item;
+                    }, $diagnosis);
+                }
+            } catch (\Throwable $t) {
+                // fallback: stringify diagnosis
+                $normalizedDiagnosis = ['raw' => json_encode($diagnosis)];
+                \Log::warning('Diagnosis normalization fallback: ' . $t->getMessage());
+            }
+
+            $activity = Activity::create([
+                'user_id' => $user->id ?? null,
+                'user_name' => $userName,
+                'user_age' => $userAge,
+                'action' => 'diagnosis',
+                'result_summary' => $topSummary,
+                'diagnosis_data' => $normalizedDiagnosis,
+                'selected_gejala' => $selectedGejalaIds,
+            ]);
+
+            if ($activity && $activity->id) {
+                \Log::info('Activity created id: ' . $activity->id . ' for user: ' . ($activity->user_name ?? 'guest'));
+                session()->flash('activity_id', $activity->id);
+            } else {
+                \Log::warning('Activity::create returned falsy result');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to log activity in KonsultasiController: ' . $e->getMessage());
+        }
 
         return view('konsultasi.result', compact('diagnosis', 'selectedGejalaIds'));
     }

@@ -120,7 +120,48 @@
                 <p class="text-lg text-gray-600">Silakan pilih gejala yang Anda alami untuk memulai diagnosis</p>
             </div>
 
-            <!-- Instructions -->
+            <!-- Name and Age Input Popup (shown on page load) -->
+            <div id="nameModalOverlay" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Data Pribadi</h2>
+                    <p class="text-gray-600 text-sm mb-6">Silakan masukkan data pribadi Anda untuk diagnosis</p>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                        <input 
+                            type="text" 
+                            id="initialNameInput" 
+                            placeholder="Masukkan nama lengkap"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                        <p id="nameError" class="text-red-600 text-xs mt-1 hidden">Nama tidak boleh kosong</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Umur (tahun)</label>
+                        <input 
+                            type="number" 
+                            id="initialAgeInput" 
+                            placeholder="Masukkan umur Anda"
+                            min="0"
+                            max="120"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                        <p id="ageError" class="text-red-600 text-xs mt-1 hidden">Umur harus antara 0-120 tahun</p>
+                    </div>
+
+                    <button 
+                        type="button"
+                        onclick="saveInitialData()"
+                        class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition"
+                    >
+                        Lanjutkan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Header -->
+
             <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-8">
                 <h3 class="font-bold text-blue-900 mb-2"><i class="fas fa-info-circle mr-2"></i>Petunjuk Penggunaan</h3>
                 <ul class="text-blue-800 text-sm space-y-1">
@@ -134,6 +175,10 @@
             <!-- Symptoms Form -->
             <form action="{{ route('konsultasi.diagnose') }}" method="POST" id="diagnosisForm">
                 @csrf
+                
+                <!-- Hidden fields to store the user data entered in popup -->
+                <input type="hidden" name="user_name" id="userNameField" value="">
+                <input type="hidden" name="user_age" id="userAgeField" value="">
 
                 <!-- Symptoms Grid -->
                 <div class="space-y-6 mb-8">
@@ -227,6 +272,81 @@
     </footer>
 
     <script>
+        let userNameGlobal = '';
+        let userAgeGlobal = '';
+
+        // Show name and age popup on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('nameModalOverlay');
+            const nameInput = document.getElementById('initialNameInput');
+            
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+            
+            if (nameInput) {
+                nameInput.focus();
+                // Allow Tab to move to age, and Enter on age to submit
+                nameInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        document.getElementById('initialAgeInput').focus();
+                    }
+                });
+            }
+
+            const ageInput = document.getElementById('initialAgeInput');
+            if (ageInput) {
+                ageInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        saveInitialData();
+                    }
+                });
+            }
+        });
+
+        function saveInitialData() {
+            const nameInput = document.getElementById('initialNameInput');
+            const ageInput = document.getElementById('initialAgeInput');
+            const nameError = document.getElementById('nameError');
+            const ageError = document.getElementById('ageError');
+            const modal = document.getElementById('nameModalOverlay');
+            
+            let isValid = true;
+
+            // Validate name
+            if (!nameInput || nameInput.value.trim() === '') {
+                if (nameError) nameError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                if (nameError) nameError.classList.add('hidden');
+                userNameGlobal = nameInput.value.trim();
+            }
+
+            // Validate age
+            const ageValue = ageInput ? ageInput.value : '';
+            if (ageValue === '' || Number(ageValue) < 0 || Number(ageValue) > 120) {
+                if (ageError) ageError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                if (ageError) ageError.classList.add('hidden');
+                userAgeGlobal = ageValue;
+            }
+
+            if (!isValid) return;
+
+            // Store in hidden fields
+            const nameField = document.getElementById('userNameField');
+            const ageField = document.getElementById('userAgeField');
+            
+            if (nameField) nameField.value = userNameGlobal;
+            if (ageField) ageField.value = userAgeGlobal;
+            
+            // Close modal
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
         const checkboxes = document.querySelectorAll('.gejala-checkbox');
         const selectedCount = document.getElementById('selectedCount');
         const selectionBar = document.getElementById('selectionBar');
@@ -240,6 +360,7 @@
             const percentage = (checked / totalGejalas) * 100;
             selectionBar.style.width = percentage + '%';
             
+            // Enable diagnose button only if at least one symptom selected
             diagnoseBtn.disabled = checked === 0;
         }
 
@@ -250,9 +371,25 @@
         // Form submission validation
         document.getElementById('diagnosisForm').addEventListener('submit', function(e) {
             const checked = document.querySelectorAll('.gejala-checkbox:checked').length;
+            const nameField = document.getElementById('userNameField');
+            const ageField = document.getElementById('userAgeField');
+
+            if (!nameField || nameField.value.trim() === '') {
+                e.preventDefault();
+                alert('Silakan masukkan nama Anda terlebih dahulu');
+                return;
+            }
+
+            if (!ageField || ageField.value === '') {
+                e.preventDefault();
+                alert('Silakan masukkan umur Anda terlebih dahulu');
+                return;
+            }
+
             if (checked === 0) {
                 e.preventDefault();
                 alert('Silakan pilih minimal 1 gejala');
+                return;
             }
         });
 

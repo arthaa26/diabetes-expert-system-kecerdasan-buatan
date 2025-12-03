@@ -90,6 +90,15 @@
             </div>
 
             <!-- Diagnosis Results -->
+
+            @if(session('activity_id'))
+                <div class="mb-6 max-w-2xl mx-auto">
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 text-sm text-indigo-800">
+                        Debug: Activity saved with ID <strong>{{ session('activity_id') }}</strong>
+                    </div>
+                </div>
+            @endif
+
             @if(count($diagnosis) > 0)
                 <div class="space-y-6 mb-12">
                     @foreach($diagnosis as $result)

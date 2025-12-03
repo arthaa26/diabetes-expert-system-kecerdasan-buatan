@@ -191,16 +191,27 @@
                         Kontak
                     </a>
                 </li>
+                @if(auth()->check() && auth()->user()->role === 'admin')
                 <li style="margin: 0;">
                     <a href="{{ route('admin.dashboard') }}" style="color: white; text-decoration: none; padding: 8px 0; display: block; transition: color 0.3s;">
-                        Dashboard
+                        Dashboard Admin
                     </a>
                 </li>
+                <li style="margin: 0;">
+                    <a href="{{ route('admin.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: white; text-decoration: none; padding: 8px 12px; background-color: #FF5722; border-radius: 6px; display: block; transition: background-color 0.3s; font-weight: bold;">
+                        Logout
+                    </a>
+                    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </li>
+                @else
                 <li style="margin: 0;">
                     <a href="/login" style="color: white; text-decoration: none; padding: 8px 12px; background-color: #FF5722; border-radius: 6px; display: block; transition: background-color 0.3s; font-weight: bold;">
                         Login Admin
                     </a>
                 </li>
+                @endif
             </ul>
 
             <!-- Mobile Navigation Links -->
@@ -217,12 +228,21 @@
                 <a href="{{ route('kontak.index') }}" style="color: white; text-decoration: none; padding: 8px 0; display: block; transition: color 0.3s;">
                     Kontak
                 </a>
+                @if(auth()->check() && auth()->user()->role === 'admin')
                 <a href="{{ route('admin.dashboard') }}" style="color: white; text-decoration: none; padding: 8px 0; display: block; transition: color 0.3s;">
-                    Dashboard
+                    Dashboard Admin
                 </a>
+                <a href="{{ route('admin.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();" style="color: white; text-decoration: none; padding: 8px 12px; background-color: #FF5722; border-radius: 6px; display: block; transition: background-color 0.3s; font-weight: bold; text-align: center;">
+                    Logout
+                </a>
+                <form id="logout-form-mobile" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+                @else
                 <a href="/login" style="color: white; text-decoration: none; padding: 8px 12px; background-color: #FF5722; border-radius: 6px; display: block; transition: background-color 0.3s; font-weight: bold; text-align: center;">
                     Login Admin
                 </a>
+                @endif
             </div>
         </div>
     </nav>
@@ -254,11 +274,11 @@
             </div>
             
             <div class="hidden lg:flex lg:w-2/5 justify-center items-center relative overflow-hidden hero-visual-bg" style="background-image: url('{{ asset('landing/img/full-2.jpg') }}'); background-size: cover; background-position: center;">
-                 <div class="hero-overlay"></div>
-                 <div class="relative z-10 p-10">
+                <div class="hero-overlay"></div>
+                <div class="relative z-10 p-10">
                     <i class="fas fa-microscope text-white text-9xl opacity-70"></i>
                     <h3 class="mt-4 text-white font-bold text-xl">FORWARD CHAINING ANALYTICS</h3>
-                 </div>
+                </div>
             </div>
 
         </div>
@@ -297,8 +317,8 @@
                 </div>
 
                 <div class="text-center mt-10">
-                    <a href="{{ route('admin.gejala.index') }}" class="btn btn-outline-dark" role="button">
-                        Lihat Semua 19 Gejala Diabetes &nbsp; <i class="fa-solid fa-list-check"></i>
+                    <a href="{{ route('konsultasi.start') }}" class="btn btn-outline-dark" role="button">
+                        Lihat Semua Gejala &nbsp; <i class="fa-solid fa-list-check"></i>
                     </a>
                 </div>
             </div>
@@ -327,15 +347,46 @@
                 <div class="row justify-content-center text-center mb-12">
                     <div class="col-md-8">
                         <span class="lead text-muted">PENGEMBANG</span>
-                        <h2 class="text-3xl">Tim Kami</h2>
+                        <h2 class="text-3xl mb-2">Tim Kami</h2>
                         <p>Proyek Akhir Semester Mata Kuliah Kecerdasan Buatan.</p>
                     </div>
                 </div>
-                <div class="row text-center">
-                    <div class="col-md-3 mt-4"><h6>Dwiki Nur Ichlas</h6><p class="text-muted">Ketua / Analis Sistem</p></div>
-                    <div class="col-md-3 mt-4"><h6>Putra Artha Nugraha</h6><p class="text-muted">Web Development</p></div>
-                    <div class="col-md-3 mt-4"><h6>Kris Prediansyah</h6><p class="text-muted">Desain & Data Entry</p></div>
-                    <div class="col-md-3 mt-4"><h6>Arya Dwi Putra</h6><p class="text-muted">Desain & Data Entry</p></div>
+                <div class="flex flex-wrap justify-center gap-8">
+                    <!-- Developer 1 -->
+                    <div class="flex flex-col items-center text-center w-full md:w-1/4">
+                        <div style="width: 180px; height: 180px; margin-bottom: 15px; border-radius: 50%; overflow: hidden; border: 4px solid #10b981; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                            <img src="landing/img/profil/dwiki.jpeg" alt="Dwiki Nur Ichlas" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h6 class="font-semibold text-lg mt-3">Dwiki Nur Ichlas</h6>
+                        <p class="text-muted text-sm">Ketua / Analis Sistem</p>
+                    </div>
+                    
+                    <!-- Developer 2 -->
+                    <div class="flex flex-col items-center text-center w-full md:w-1/4">
+                        <div style="width: 180px; height: 180px; margin-bottom: 15px; border-radius: 50%; overflow: hidden; border: 4px solid #10b981; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                            <img src="landing/img/profil/artha.jpeg" alt="Putra Artha Nugraha" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h6 class="font-semibold text-lg mt-3">Putra Artha Nugraha</h6>
+                        <p class="text-muted text-sm">Web Development</p>
+                    </div>
+                    
+                    <!-- Developer 3 -->
+                    <div class="flex flex-col items-center text-center w-full md:w-1/4">
+                        <div style="width: 180px; height: 180px; margin-bottom: 15px; border-radius: 50%; overflow: hidden; border: 4px solid #10b981; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                            <img src="landing/img/profil/kris.jpeg" alt="Kris Prediansyah" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h6 class="font-semibold text-lg mt-3">Kris Prediansyah</h6>
+                        <p class="text-muted text-sm">Desain & Data Entry</p>
+                    </div>
+                    
+                    <!-- Developer 4 -->
+                    <div class="flex flex-col items-center text-center w-full md:w-1/4">
+                        <div style="width: 180px; height: 180px; margin-bottom: 15px; border-radius: 50%; overflow: hidden; border: 4px solid #10b981; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                            <img src="landing/img/profil/arya.jpeg" alt="Arya Dwi Putra" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h6 class="font-semibold text-lg mt-3">Arya Dwi Putra</h6>
+                        <p class="text-muted text-sm">Desain & Data Entry</p>
+                    </div>
                 </div>
             </div>
         </div>

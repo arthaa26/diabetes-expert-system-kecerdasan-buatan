@@ -13,11 +13,11 @@
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800">Manajemen Gejala</h1>
-                <p class="text-gray-600">Kelola pertanyaan/gejala untuk diagnosis</p>
+                <h1 class="text-3xl font-bold text-gray-800">Manajemen Aturan</h1>
+                <p class="text-gray-600">Kelola aturan sistem pakar (IF-THEN rules)</p>
             </div>
-            <a href="{{ route('admin.gejala.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
-                + Tambah Gejala
+            <a href="{{ route('admin.aturan.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg">
+                + Tambah Aturan
             </a>
         </div>
 
@@ -33,19 +33,25 @@
             <table class="w-full">
                 <thead class="bg-gray-200">
                     <tr>
-                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">Kode</th>
-                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">Nama Gejala</th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">Nama Aturan</th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">Penyakit</th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">Confidence</th>
                         <th class="px-6 py-3 text-center text-sm font-bold text-gray-700">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
-                    @forelse ($gejalas as $gejala)
+                    @forelse ($aturans as $aturan)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 text-sm font-mono text-gray-800">{{ $gejala->kode_gejala }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ $gejala->nama_gejala }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-800">{{ $aturan->nama_aturan }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $aturan->penyakit->nama_penyakit ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
+                                    {{ number_format($aturan->confidence, 2) }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 text-center text-sm">
-                                <a href="{{ route('admin.gejala.edit', $gejala) }}" class="text-blue-500 hover:text-blue-700 font-medium">Edit</a>
-                                <form action="{{ route('admin.gejala.destroy', $gejala) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin akan dihapus?');">
+                                <a href="{{ route('admin.aturan.edit', $aturan) }}" class="text-blue-500 hover:text-blue-700 font-medium">Edit</a>
+                                <form action="{{ route('admin.aturan.destroy', $aturan) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin akan dihapus?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-500 hover:text-red-700 font-medium ml-4">Hapus</button>
@@ -54,8 +60,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-6 py-8 text-center text-gray-500">
-                                Tidak ada gejala. <a href="{{ route('admin.gejala.create') }}" class="text-blue-500">Buat gejala baru</a>
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                Tidak ada aturan. <a href="{{ route('admin.aturan.create') }}" class="text-blue-500">Buat aturan baru</a>
                             </td>
                         </tr>
                     @endforelse
@@ -65,7 +71,7 @@
 
         <!-- Pagination -->
         <div class="mt-6">
-            {{ $gejalas->links() }}
+            {{ $aturans->links() }}
         </div>
     </div>
 </div>

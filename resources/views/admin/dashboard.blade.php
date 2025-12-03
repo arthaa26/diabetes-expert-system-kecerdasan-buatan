@@ -59,18 +59,24 @@
                     <thead class="border-b">
                         <tr>
                             <th class="py-3 px-4 text-sm text-gray-600">User</th>
+                            <th class="py-3 px-4 text-sm text-gray-600">Umur</th>
                             <th class="py-3 px-4 text-sm text-gray-600">Diagnosis</th>
-                            <th class="py-3 px-4 text-sm text-gray-600">Hasil</th>
                             <th class="py-3 px-4 text-sm text-gray-600">Waktu</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="border-b">
-                            <td class="py-3 px-4">-</td>
-                            <td class="py-3 px-4">-</td>
-                            <td class="py-3 px-4">-</td>
-                            <td class="py-3 px-4">-</td>
-                        </tr>
+                        @forelse($activities as $activity)
+                            <tr class="border-b">
+                                <td class="py-3 px-4">{{ $activity->user_name ?? 'Guest' }}</td>
+                                <td class="py-3 px-4">{{ $activity->user_age ?? '-' }}</td>
+                                <td class="py-3 px-4">{{ $activity->result_summary ?? '-' }}</td>
+                                <td class="py-3 px-4">{{ optional($activity->created_at)->diffForHumans() }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-3 px-4 text-center text-gray-500">Belum ada aktivitas.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
