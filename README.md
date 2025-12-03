@@ -1,59 +1,56 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Diabetes Expert System — Kecerdasan Buatan
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Ringkasan singkat: aplikasi pakar sederhana untuk membantu skrining risiko diabetes menggunakan aturan berbasis gejala. Aplikasi dibuat dengan Laravel dan menyajikan halaman Home setelah aplikasi berjalan.
 
-## About Laravel
+**Tampilan Home**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Buka `http://127.0.0.1:8000` atau alamat host lokal Laragon Anda setelah aplikasi dijalankan.
+- Halaman Home default ditempatkan di route `/` dan disajikan oleh Blade view (`resources/views/welcome.blade.php` atau `resources/views/home.blade.php`).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Menjalankan secara lokal (PowerShell / Laragon)**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Jalankan perintah berikut dari direktori proyek (`c:\laragon\www\diabetes-expert-system-kecerdasan-buatan`):
 
-## Learning Laravel
+```powershell
+# Pasang dependensi PHP
+composer install
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+# Salin file env dan buat APP KEY
+copy .env.example .env
+php artisan key:generate
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Edit .env untuk konfigurasi database (DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD)
 
-## Laravel Sponsors
+# Jalankan migrasi dan seeder (opsional: --seed jika ingin data contoh)
+php artisan migrate --seed
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Jalankan server bawaan Laravel
+php artisan serve --host=127.0.0.1 --port=8000
 
-### Premium Partners
+# Buka browser ke:
+http://127.0.0.1:8000
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Jika Anda menggunakan Laragon, Anda kemungkinan memiliki virtual host (mis. `http://diabetes.test`) — sesuaikan `APP_URL` di `.env` dan buka alamat tersebut.
 
-## Contributing
+**Jika halaman Home menampilkan halaman Laravel default / tidak muncul**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Pastikan migrasi dan seeder dijalankan (`php artisan migrate --seed`).
+- Periksa route `/` di `routes/web.php` untuk memastikan diarahkan ke view Home yang benar.
+- Periksa log di `storage/logs/laravel.log` untuk error runtime.
 
-## Code of Conduct
+**Catatan singkat tentang hosting**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- GitHub Pages hanya mendukung konten statis — tidak cocok untuk menjalankan aplikasi Laravel secara penuh.
+- Untuk men-deploy aplikasi Laravel dengan backend (PHP), gunakan layanan seperti Render, DigitalOcean App Platform, atau VPS yang mendukung PHP 8.x.
+- Jika Anda tetap ingin GitHub Pages untuk preview statis, saya bisa bantu menyalin isi folder `public/` ke `docs/`.
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Apakah Anda ingin saya:
 
-## License
+- menambahkan tangkapan layar Home (saya bisa menambahkan placeholder dan instruksi untuk upload gambar),
+- menyiapkan file untuk deploy ke Render (Dockerfile / render.yaml), atau
+- mengekspor `public/` ke `docs/` untuk GitHub Pages sekarang?
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Balas pilihan Anda dan saya akan lanjutkan.
